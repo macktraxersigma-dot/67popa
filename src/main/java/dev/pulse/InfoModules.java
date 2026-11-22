@@ -101,9 +101,9 @@ final class InfoModules {
                 double[] p = f.proj.p(e.x, e.y + e.h + 0.6, e.z); if (p == null) continue;
                 double fr = Math.max(0, Math.min(1, e.hp / Math.max(1, e.maxHp)));
                 String hp = String.format(java.util.Locale.ROOT, "%.1f", e.hp), pg = ping.on() && e.ping >= 0 ? "  " + e.ping + "ms" : "";
-                int w = g.textWidth(e.name + " " + hp + pg) + 10, x = (int) p[0] - w / 2, y = (int) p[1] - 12;
-                pill(g, x, y, x + w, y + 13, 0xB0101015); g.fill(x + 1, y + 12, x + 1 + (int) ((w - 2) * fr), y + 13, mix(0xFFFF4D4D, 0xFF4DFF88, fr));
-                int tx = x + 5; g.text(e.name, tx, y + 3, 0xFFFFFFFF); tx += g.textWidth(e.name + " ");
+                int w = g.boldWidth(e.name) + g.textWidth(" " + hp + pg) + 10, x = (int) p[0] - w / 2, y = (int) p[1] - 12;
+                pill(g, x, y, x + w, y + 13, 0xB0141220); g.fill(x + 1, y + 12, x + 1 + (int) ((w - 2) * fr), y + 13, mix(0xFFFF4D4D, 0xFF4DFF88, fr));
+                int tx = x + 5; g.bold(e.name, tx, y + 3, 0xFFFFFFFF); tx += g.boldWidth(e.name) + g.textWidth(" ");
                 g.text(hp, tx, y + 3, mix(0xFFFF4D4D, 0xFF4DFF88, fr)); tx += g.textWidth(hp);
                 if (!pg.isEmpty()) g.text(pg, tx, y + 3, 0xFF9A9AA6);
                 if (armor.on()) { int n = 0; for (Object o : e.armor) if (o != null) n++; int ax = (int) p[0] - n * 9;
@@ -123,7 +123,7 @@ final class InfoModules {
                 int y = b[1], n = 0;
                 for (Eff x : e.eff) { if (n++ >= 5) break;
                     String s = x.name + (x.amp > 0 ? " " + (x.amp + 1) : "") + "  " + time(x.ticks);
-                    int w = g.textWidth(s) + 8; pill(g, b[2] + 5, y, b[2] + 5 + w, y + 12, 0xA0101015);
+                    int w = g.textWidth(s) + 8; pill(g, b[2] + 5, y, b[2] + 5 + w, y + 12, 0xA0141220);
                     g.fill(b[2] + 5, y + 1, b[2] + 7, y + 11, Theme.c(n * 0.2)); g.text(s, b[2] + 10, y + 2, x.ticks < 200 ? 0xFFFFA0A0 : 0xFFFFFFFF); y += 14; }
             }
         }
@@ -208,7 +208,7 @@ final class InfoModules {
             }
             if (info.on() && e.maxHp > 0) {
                 int w = 120, x = f.sw / 2 - w / 2, y = f.sh / 2 + 46; double fr = Math.max(0, Math.min(1, e.hp / e.maxHp));
-                pill(g, x, y, x + w, y + 24, mulA(0xB0101015, fade)); g.text(e.name, x + 6, y + 4, mulA(0xFFFFFFFF, fade));
+                pill(g, x, y, x + w, y + 24, mulA(0xB0141220, fade)); g.text(e.name, x + 6, y + 4, mulA(0xFFFFFFFF, fade));
                 String hs = String.format(java.util.Locale.ROOT, "%.1f", e.hp); g.text(hs, x + w - 6 - g.textWidth(hs), y + 4, mulA(mix(0xFFFF4D4D, 0xFF4DFF88, fr), fade));
                 g.fill(x + 6, y + 16, x + w - 6, y + 19, mulA(0x40FFFFFF, fade)); g.fill(x + 6, y + 16, x + 6 + (int) ((w - 12) * fr), y + 19, mulA(Theme.c(), fade));
             }

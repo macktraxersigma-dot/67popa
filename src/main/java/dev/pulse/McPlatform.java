@@ -30,6 +30,10 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Style;
+import net.minecraft.text.StyleSpriteSource;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -66,14 +70,43 @@ final class McPlatform {
             c.fill(x1, y1, x2, y2, argb);
         }
 
+        private static final StyleSpriteSource UI = new StyleSpriteSource.Font(Identifier.of("pulse", "ui")),
+                BOLD = new StyleSpriteSource.Font(Identifier.of("pulse", "bold"));
+        private static final Map<String, Text> UI_T = new HashMap<>(), BOLD_T = new HashMap<>();
+        private static final Map<String, Integer> UI_W = new HashMap<>(), BOLD_W = new HashMap<>();
+
+        private static Text styled(Map<String, Text> cache, StyleSpriteSource f, String s) {
+            Text t = cache.get(s);
+            if (t == null) {
+                if (cache.size() > 600) cache.clear();
+                t = Text.literal(s).setStyle(Style.EMPTY.withFont(f));
+                cache.put(s, t);
+            }
+            return t;
+        }
+
         @Override
         public void text(String s, int x, int y, int argb) {
-            c.drawText(t, s, x, y, argb, true);
+            c.drawText(t, styled(UI_T, UI, s), x, y, argb, false);
+        }
+
+        @Override
+        public void bold(String s, int x, int y, int argb) {
+            c.drawText(t, styled(BOLD_T, BOLD, s), x, y, argb, false);
         }
 
         @Override
         public int textWidth(String s) {
-            return t.getWidth(s);
+            Integer w = UI_W.get(s);
+            if (w == null) { if (UI_W.size() > 600) UI_W.clear(); w = t.getWidth(styled(UI_T, UI, s)); UI_W.put(s, w); }
+            return w;
+        }
+
+        @Override
+        public int boldWidth(String s) {
+            Integer w = BOLD_W.get(s);
+            if (w == null) { if (BOLD_W.size() > 600) BOLD_W.clear(); w = t.getWidth(styled(BOLD_T, BOLD, s)); BOLD_W.put(s, w); }
+            return w;
         }
 
         @Override

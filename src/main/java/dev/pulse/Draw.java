@@ -79,10 +79,14 @@ final class Draw {
         int ix = (int) Math.round(x) - s / 2, iy = (int) Math.round(y) - s / 2; g.fill(ix, iy, ix + s, iy + s, c);
     }
 
-    /** Скруглённая плашка (срезанные углы). */
-    static void pill(Gfx g, int x1, int y1, int x2, int y2, int c) {
-        g.fill(x1 + 1, y1, x2 - 1, y2, c); g.fill(x1, y1 + 1, x2, y2 - 1, c);
+    /** Единая «карточка» всего интерфейса: тёмная скруглённая плашка с тонкой светлой обводкой. */
+    static void card(Gfx g, int x1, int y1, int x2, int y2, int c) {
+        round(g, x1 - 1, y1 - 1, x2 + 1, y2 + 1, 4, 0x24FFFFFF); round(g, x1, y1, x2, y2, 3, c);
     }
+
+    static void pill(Gfx g, int x1, int y1, int x2, int y2, int c) { card(g, x1, y1, x2, y2, c); }
+
+    static void textCB(Gfx g, String s, double cx, int y, int c) { g.bold(s, (int) cx - g.boldWidth(s) / 2, y, c); }
 
     static void textC(Gfx g, String s, double cx, int y, int c) { g.text(s, (int) cx - g.textWidth(s) / 2, y, c); }
 

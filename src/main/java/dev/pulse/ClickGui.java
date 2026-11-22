@@ -24,6 +24,8 @@ final class ClickGui {
         public void fill(int x1, int y1, int x2, int y2, int c) { b.fill(x1, y1, x2, y2, mulA(c, a)); }
         public void text(String s, int x, int y, int c) { c = mulA(c, a); if ((c >>> 24) >= 8) b.text(s, x, y, c); }
         public int textWidth(String s) { return b.textWidth(s); }
+        public void bold(String s, int x, int y, int c) { c = mulA(c, a); if ((c >>> 24) >= 8) b.bold(s, x, y, c); }
+        public int boldWidth(String s) { return b.boldWidth(s); }
         public void item(Object st, int x, int y) { b.item(st, x, y); }
         public void gradient(int x1, int y1, int x2, int y2, int t, int bt) { b.gradient(x1, y1, x2, y2, mulA(t, a), mulA(bt, a)); }
     }
@@ -55,7 +57,7 @@ final class ClickGui {
             round(g, x - 1, y - 1, x + PW + 1, y + h + 1, 5, BORDER);
             round(g, x, y, x + PW, y + h, 4, PANEL);
             round(g, x + 1, y + 1, x + PW - 1, y + HEAD - 1, 4, 0x16FFFFFF);
-            textC(g, TITLES[c], x + PW / 2.0, y + 7, 0xFFF4F2FF);
+            textCB(g, TITLES[c], x + PW / 2.0, y + 7, 0xFFF4F2FF);
             g.fill(x + 14, y + HEAD - 1, x + PW - 14, y + HEAD, alpha(acc, 170));
             y += HEAD + PAD;
             for (Module m : Pulse.mods) {
@@ -87,7 +89,7 @@ final class ClickGui {
             }
         }
 
-        textC(g, "Pulse Visual", vw / 2.0, y0 - 24, Theme.c());
+        textCB(g, "Pulse Visual", vw / 2.0, y0 - 24, Theme.c());
         textC(g, hovered != null ? hovered.name + " — " + hovered.desc : "ЛКМ — вкл/выкл · ПКМ или ··· — настройки · печатай для поиска · Right Shift — закрыть", vw / 2.0, y0 - 12, hovered != null ? 0xFFB8B4CC : 0xFF6E6A82);
 
         int bw = 150, bx = (vw - bw) / 2, by = vh - 34;
@@ -99,7 +101,7 @@ final class ClickGui {
         if (cx > x0 + total + 6) {
             round(g, cx - 1, cy - 1, cx + cw + 1, cy + 2 * (ROW + RG) + HEAD + PAD * 2 + 1, 5, BORDER);
             round(g, cx, cy, cx + cw, cy + 2 * (ROW + RG) + HEAD + PAD * 2, 4, PANEL);
-            textC(g, "КОНФИГ", cx + cw / 2.0, cy + 7, 0xFFF4F2FF); g.fill(cx + 14, cy + HEAD - 1, cx + cw - 14, cy + HEAD, alpha(Theme.c(), 170));
+            textCB(g, "КОНФИГ", cx + cw / 2.0, cy + 7, 0xFFF4F2FF); g.fill(cx + 14, cy + HEAD - 1, cx + cw - 14, cy + HEAD, alpha(Theme.c(), 170));
             for (int i = 0; i < 2; i++) {
                 int ry = cy + HEAD + PAD + i * (ROW + RG); boolean hov = mx >= cx + PAD && mx < cx + cw - PAD && my >= ry && my < ry + ROW;
                 round(g, cx + PAD, ry, cx + cw - PAD, ry + ROW, 3, argb(hov ? 40 : 18, 255, 255, 255));

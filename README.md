@@ -12,3 +12,6 @@
 
 ## Если сборка упала
 Пришли текст ошибки. Весь код, который обращается к Minecraft, собран в трёх файлах: `McPlatform.java`, `PulseClient.java`, `PulseScreen.java`. Всё остальное от версии игры не зависит.
+
+## Шрифт
+Интерфейс использует шрифт Ubuntu (Ubuntu Font Licence), лежит в `src/main/resources/assets/pulse/font`. Если текст сидит выше/ниже центра, поправь `shift` в `ui.json` и `bold.json` (например `[0.0, 1.0]`), размер — параметр `size`.

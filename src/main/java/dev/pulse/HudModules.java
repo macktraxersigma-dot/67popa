@@ -9,23 +9,36 @@ final class HudModules {
 
     // ───────────── Interface ─────────────
     static final class Interface extends Module {
-        final Setting accent = mode("Акцент", 0, Theme.NAMES), watermark = bool("Ватермарк", true), list = bool("Список модулей", true), coords = bool("Координаты", true);
-        Interface() { super("Interface", "HUD", "Тема, ватермарк, список модулей и координаты"); add(accent, watermark, list, coords); on = true; }
+        final Setting accent = mode("Акцент", 0, Theme.NAMES), watermark = bool("Ватермарк", true), list = bool("Список модулей", true), coords = bool("Координаты", true), target = bool("Карточка цели", true);
+        int tid = -1; double thp;
+        Interface() { super("Interface", "HUD", "Тема, ватермарк, список модулей, координаты и карточка цели"); add(accent, watermark, list, coords, target); on = true; }
 
         @Override void render(Frame f, Gfx g) {
-            Self m = f.me;
+            Self m = f.me; int acc = Theme.c();
             if (watermark.on()) {
-                String s = "Pulse Visual  |  " + m.name + "  |  " + m.fps + " fps" + (m.ping > 0 ? "  |  " + m.ping + " ms" : "");
-                int w = g.textWidth(s) + 14; pill(g, 6, 6, 6 + w, 22, 0xB0101015); g.fill(7, 6, 5 + w, 7, Theme.c()); g.fill(6, 8, 8, 20, Theme.c());
-                g.text("Pulse Visual", 14, 11, Theme.c()); g.text(s.substring("Pulse Visual".length()), 14 + g.textWidth("Pulse Visual"), 11, 0xFFE8E8EE);
+                String rest = m.name + "  ·  " + m.fps + " fps" + (m.ping > 0 ? "  ·  " + m.ping + " ms" : "");
+                int bw = g.boldWidth("Pulse"), w = bw + g.textWidth(rest) + 32;
+                card(g, 6, 6, 6 + w, 22, 0xC0141220); g.fill(14, 6, 6 + w - 8, 7, alpha(acc, 190));
+                round(g, 12, 12, 16, 16, 2, acc); g.bold("Pulse", 21, 10, acc); g.text(rest, 21 + bw + 8, 10, 0xFFE6E4F2);
             }
-            if (coords.on()) { String s = String.format(java.util.Locale.ROOT, "XYZ  %.1f  %.1f  %.1f", m.x, m.y, m.z); int w = g.textWidth(s) + 10;
-                pill(g, 6, 26, 6 + w, 39, 0xA0101015); g.text(s, 11, 29, 0xFFD6D6DE); }
+            int y0 = 28;
+            if (coords.on()) { String s = String.format(java.util.Locale.ROOT, "XYZ  %.1f  %.1f  %.1f", m.x, m.y, m.z); int w = g.textWidth(s) + 14;
+                card(g, 6, y0, 6 + w, y0 + 15, 0xB0141220); g.text(s, 13, y0 + 4, 0xFFD2D0E0); }
             if (list.on()) {
                 List<Module> on = new ArrayList<>(); for (Module x : Pulse.mods) if (x.on && x != this) on.add(x);
                 on.sort((a, b) -> g.textWidth(b.name) - g.textWidth(a.name)); int y = 6, i = 0;
-                for (Module x : on) { int w = g.textWidth(x.name) + 10, x2 = f.sw - 4;
-                    g.fill(x2 - w, y, x2, y + 12, 0x90101015); g.fill(x2 - 2, y, x2, y + 12, Theme.c(i * 0.08)); g.text(x.name, x2 - w + 4, y + 2, Theme.c(i * 0.08)); y += 12; i++; }
+                for (Module x : on) { int w = g.textWidth(x.name) + 14, x2 = f.sw - 6; int c = Theme.c(i * 0.08);
+                    round(g, x2 - w, y, x2, y + 14, 3, 0xA0141220); round(g, x2 - 3, y + 3, x2 - 1, y + 11, 1, c); g.text(x.name, x2 - w + 6, y + 3, c); y += 16; i++; }
+            }
+            if (target.on() && f.target != null && !f.target.kind.equals("item")) {
+                Ent t = f.target; if (t.id != tid) { tid = t.id; thp = t.hp; } thp += (t.hp - thp) * 0.12;
+                double fr = Math.max(0, Math.min(1, thp / Math.max(1, t.maxHp)));
+                String nm = t.name.length() > 13 ? t.name.substring(0, 12) + "…" : t.name, hp = String.format(java.util.Locale.ROOT, "%.1f", t.hp);
+                int w = 128, x = f.sw / 2 + 28, y = f.sh / 2 + 16;
+                card(g, x, y, x + w, y + 30, 0xC0141220);
+                g.bold(nm, x + 8, y + 6, 0xFFFFFFFF); g.text(hp, x + w - 8 - g.textWidth(hp), y + 6, mix(0xFFFF5566, 0xFF55FF8A, fr));
+                round(g, x + 8, y + 20, x + w - 8, y + 24, 2, 0x30FFFFFF);
+                int fw = (int) ((w - 16) * fr); if (fw >= 3) round(g, x + 8, y + 20, x + 8 + fw, y + 24, 2, acc);
             }
         }
     }
@@ -58,8 +71,8 @@ final class HudModules {
             }
             for (Iterator<A> it = alerts.iterator(); it.hasNext(); ) {
                 A a = it.next(); long left = a.until - f.now; if (left <= 0) { it.remove(); continue; } double k = Math.min(1, left / 500.0);
-                int w = g.textWidth(a.t) + 16; pill(g, f.sw / 2 - w / 2, y - 3, f.sw / 2 + w / 2, y + 13, mulA(0xC0101015, k));
-                g.fill(f.sw / 2 - w / 2, y - 2, f.sw / 2 - w / 2 + 2, y + 12, mulA(a.col, k)); textC(g, a.t, f.sw / 2.0, y + 1, mulA(a.col, k)); y += 18;
+                int w = g.textWidth(a.t) + 16; pill(g, f.sw / 2 - w / 2, y - 3, f.sw / 2 + w / 2, y + 13, mulA(0xC0141220, k));
+                g.fill(f.sw / 2 - w / 2 + 6, y + 12, f.sw / 2 - w / 2 + 6 + (int) ((w - 12) * left / 3000.0), y + 13, mulA(a.col, k)); textC(g, a.t, f.sw / 2.0, y + 1, mulA(a.col, k)); y += 18;
             }
         }
         static double m(Frame f) { return f.me.hp + f.me.absorb; }
@@ -93,7 +106,7 @@ final class HudModules {
         @Override void render(Frame f, Gfx g) {
             int x = f.sw - 4 * 24 - 6, y = f.sh - (pct.on() ? 44 : 34), n = 0; for (Object o : f.me.armor) if (o != null) n++;
             if (n == 0) return;
-            pill(g, x - 4, y - 4, f.sw - 2, y + (pct.on() ? 34 : 24), 0x90101015);
+            pill(g, x - 4, y - 4, f.sw - 2, y + (pct.on() ? 34 : 24), 0x90141220);
             for (int i = 0; i < 4; i++) { Object o = f.me.armor[i]; double fr = f.me.armorFrac[i]; int ix = x + i * 24;
                 if (o == null) { g.fill(ix + 1, y + 1, ix + 15, y + 15, 0x20FFFFFF); continue; }
                 g.item(o, ix, y); int bc = mix(0xFFFF4D4D, 0xFF4DFF88, fr);
